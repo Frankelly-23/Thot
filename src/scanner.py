@@ -2,8 +2,10 @@
 from token import Token
 from tokenType import TokenType
 from errorUtils import error
+from keywords import KEYWORDS
 
 class Scanner:
+     
     def __init__(self, source: str) -> None:
         self.source: str = source
         self.tokens: list[Token] = []  
@@ -71,6 +73,24 @@ class Scanner:
         value = self.source[self.start:self.current]
         self._add_token(TokenType.NUMBER, value)
 
+    def _is_alpha(self, char):
+        return char.isalpha() or char == "_"
+
+    def _is_aphaNumeric(self, char):
+        return self._is_alpha(char) or char.isdigit()
+
+    def _identifier(self):
+        while self._is_aphaNumeric(self._peek()):
+            self._advance()
+
+        text = self.source[self.start:self.current]
+        Ttype = KEYWORDS.get(text)   
+        
+        if Ttype == None:
+            Ttype = TokenType.IDENTIFIER
+
+        self._add_token(Ttype)
+
     def _scan_token(self):
         
        c = self._advance() 
@@ -126,6 +146,8 @@ class Scanner:
         case _:
             if c.isdigit():
                 self._number()
+            elif self._is_alpha(c):
+               self._identifier() 
             else:
                 error(self.line, "Unexpected character.")
         
