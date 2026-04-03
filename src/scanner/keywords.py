@@ -1,4 +1,4 @@
-from tokenType import TokenType
+from scanner.tokenType import TokenType
 
 KEYWORDS = {
         "and":    TokenType.AND,

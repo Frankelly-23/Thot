@@ -1,5 +1,5 @@
-from tokenType import TokenType
 
+from scanner.tokenType import TokenType
 class Token:
     def __init__(self, t_type: TokenType, lexeme: str, literal, line: int) -> None:
         self.type: TokenType = t_type

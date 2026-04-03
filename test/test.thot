@@ -1,0 +1,13 @@
+let hola = 'Hola Mundo'
+let numero = 23
+let bool = zero
+
+if hola == 'Hola Mundo' {
+  return nada 
+}
+
+/* hola 
+
+amigos 
+
+*/

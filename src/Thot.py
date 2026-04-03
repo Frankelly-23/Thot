@@ -1,13 +1,12 @@
 #!/bin/python3
 
 import sys
-from scanner import Scanner
-from errorUtils import had_error 
-
+import errorUtils
+from scanner.scanner import Scanner
 
 def run(source: str):
     scanner: Scanner = Scanner(source)
-    tokens: list[str] = scanner.scan_tokens()
+    tokens = scanner.scan_tokens()
     
     for token in tokens:
         print(token)
@@ -18,17 +17,16 @@ def run_file(path: str):
 
     run(source_code)    
 
-    if had_error: 
+    if errorUtils.had_error: 
         sys.exit(65) 
         
     
 def run_prompt():
-    global had_error
     while True:
         try:
            expresion = input("Thot [> ") 
            run(expresion)
-           had_error = False
+           errorUtils.had_error = False
         except EOFError:
             print()
             break
@@ -38,7 +36,7 @@ def main() -> None:
     args = sys.argv[1:]
     if len(args) > 1:
 
-        print("Usage: Thot [script]")
+        sys.stdout.write("Usage: Thot [script]")
         sys.exit(64)
 
     elif len(args) == 1:

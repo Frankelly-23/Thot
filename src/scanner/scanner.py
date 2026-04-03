@@ -1,8 +1,8 @@
 
-from token import Token
-from tokenType import TokenType
+from scanner.token import Token
+from scanner.tokenType import TokenType
 from errorUtils import error
-from keywords import KEYWORDS
+from scanner.keywords import KEYWORDS
 
 class Scanner:
      
@@ -126,11 +126,28 @@ class Scanner:
         case ">":
             self._add_token(TokenType.GREATER_EQUAL if self._match("=") else TokenType.GREATER)
         case "/":
+
             if self._match("/"):
                 while self._peek() != "\n" and not self._is_at_end():
                     self._advance()
+
+            elif self._match("*"):
+                while not self._is_at_end(): 
+                    if self._peek() == "*" and self._nextpeek() == "/":
+                        break  
+                    if self._peek() == "\n":
+                        self.line += 1
+                    self._advance()
+
+                if self._is_at_end():
+                    error(self.line, "Unterminated comment")
+                    return
+
+                self._advance()
+                self._advance()
             else:
                 self._add_token(TokenType.SLASH)
+
         # Literals.
         case "'":
             self._string() 
@@ -144,6 +161,7 @@ class Scanner:
         case "\n":
             self.line += 1
         case _:
+        # number
             if c.isdigit():
                 self._number()
             elif self._is_alpha(c):

@@ -1,6 +1,5 @@
 
 import sys
-
 had_error = False
 
 def report(line: int, where: str, message: str):
