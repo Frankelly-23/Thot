@@ -2,15 +2,28 @@
 
 import sys
 import errorUtils
+
+from scanner.token import Token
 from scanner.scanner import Scanner
+from parser.parser import Parser
+from parser.expr import Expr
+from parser.ast_printer import Ast_printer 
 
 def run(source: str):
-    scanner: Scanner = Scanner(source)
-    tokens = scanner.scan_tokens()
-    
-    for token in tokens:
-        print(token)
 
+    scanner: Scanner = Scanner(source)
+    tokens: list[Token] = scanner.scan_tokens()
+    
+    parser: Parser = Parser(tokens)
+    expresion: Expr = parser.parse()
+    
+    if errorUtils.had_error:
+       return 
+    
+    ast_printer = Ast_printer()
+
+    sys.stderr.write(ast_printer.print_exp(expresion)) 
+    
 def run_file(path: str):
     with open(path, "r", encoding="utf-8") as file:
         source_code = file.read()

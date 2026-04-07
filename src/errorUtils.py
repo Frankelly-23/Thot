@@ -1,5 +1,8 @@
 
 import sys
+from scanner.token import Token
+from scanner.tokenType import TokenType 
+
 had_error = False
 
 def report(line: int, where: str, message: str):
@@ -7,5 +10,10 @@ def report(line: int, where: str, message: str):
     print(f"[+] Error at line: {line}, Issue {where}: {message}", file=sys.stderr)
     had_error = True 
 
-def error(line: int, message: str):
-    report(line, "", message)
+def error(token: Token, message: str):
+
+    if token.type == TokenType.EOF: 
+        report(token.line, "At end", message)
+
+    else:
+        report(token.line, f"At '{token.lexeme}' " , message)

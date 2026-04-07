@@ -4,16 +4,6 @@ from scanner.token import Token
 from scanner.tokenType import TokenType
 
 
-expression: Expr = Binary(
-        Unary(
-            Token(TokenType.MINUS, "-", None, 1), 
-            Literal(123)
-            ),
-        Token(TokenType.STAR, "*", None, 1),
-        Grouping(
-            Literal(23.23)
-            )
-        ) 
 
 class Ast_printer(Visitor):
 
@@ -44,5 +34,3 @@ class Ast_printer(Visitor):
         return result
             
 
-
-print(Ast_printer().print_exp(expression))

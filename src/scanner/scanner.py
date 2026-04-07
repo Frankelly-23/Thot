@@ -152,11 +152,7 @@ class Scanner:
         case "'":
             self._string() 
         # garbage
-        case " ":
-            pass
-        case "\t":
-            pass
-        case "\r":
+        case " " | "\t" | "\r":
             pass
         case "\n":
             self.line += 1
