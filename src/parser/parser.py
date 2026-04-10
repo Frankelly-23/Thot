@@ -76,9 +76,18 @@ class Parser:
            self._advance() 
 
    def expression(self):
-        return self.equality() 
+        return self.comma() 
 
-    # Binary
+   # Binary
+   def comma(self): 
+       expr: Expr = self.equality() 
+
+       while self._match(TokenType.COMMA):
+            operator = self._previus()  
+            expr_right = self.equality() 
+            expr = Binary(expr, operator, expr_right)
+       return expr
+
    def equality(self):
         expr: Expr = self.comparison() 
 
@@ -146,7 +155,27 @@ class Parser:
        if self._match(TokenType.LEFT_PAREN):
            expr: Expr = self.expression() 
            self._consume(TokenType.RIGHT_PAREN, "Expected )")
-
            return Grouping(expr)
-       
+
+       if self._match(TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL):
+            self._error(self._previus(), "Missing left-hand operand.")
+            self.comparison() 
+            return None 
+
+       if self._match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL):
+            self._error(self._previus(), "Missing left-hand operand.")
+            self.term() 
+            return None
+
+       if self._match(TokenType.PLUS): 
+            self._error(self._previus(), "Missing left-hand operand.")
+            self.factor()
+            return None
+
+       if self._match(TokenType.STAR, TokenType.SLASH):
+            self._error(self._previus(), "Missing left-hand operand.")
+            self.unary()
+            return None      
+
        raise self._error(self._peek(), "Expect expression.")
+
