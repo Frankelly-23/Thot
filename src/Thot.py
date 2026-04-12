@@ -1,3 +1,4 @@
+
 #!/bin/python3
 
 import sys
@@ -7,7 +8,7 @@ from scanner.token import Token
 from scanner.scanner import Scanner
 from parser.parser import Parser
 from parser.expr import Expr
-from parser.ast_printer import Ast_printer 
+from interpreter.interpreter import Interpreter 
 
 def run(source: str):
 
@@ -16,13 +17,14 @@ def run(source: str):
     
     parser: Parser = Parser(tokens)
     expresion: Expr = parser.parse()
+    interpreter = Interpreter()    
     
+    print(interpreter.evaluate(expresion))
+
     if errorUtils.had_error:
        return 
     
-    ast_printer = Ast_printer()
 
-    sys.stderr.write(ast_printer.print_exp(expresion)) 
     
 def run_file(path: str):
     with open(path, "r", encoding="utf-8") as file:

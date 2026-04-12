@@ -1,5 +1,5 @@
 
-from parser.expr import Visitor, Expr, Binary, Grouping, Literal, Unary
+from parser.expr import * 
 from scanner.token import Token
 from scanner.tokenType import TokenType
 
