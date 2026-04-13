@@ -12,6 +12,8 @@ from interpreter.interpreter import Interpreter
 
 def run(source: str):
 
+       
+
     scanner: Scanner = Scanner(source)
     tokens: list[Token] = scanner.scan_tokens()
     
@@ -19,11 +21,14 @@ def run(source: str):
     expresion: Expr = parser.parse()
     interpreter = Interpreter()    
     
-    print(interpreter.evaluate(expresion))
 
     if errorUtils.had_error:
-       return 
-    
+       sys.exit(65) 
+
+    interpreter.interpret(expresion)
+
+    if errorUtils.hadRuntimeError:
+       sys.exit(70) 
 
     
 def run_file(path: str):

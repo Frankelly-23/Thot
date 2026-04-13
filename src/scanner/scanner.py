@@ -1,7 +1,7 @@
 
 from scanner.token import Token
 from scanner.tokenType import TokenType
-from errorUtils import error
+from errorUtils import scan_error 
 from scanner.keywords import KEYWORDS
 
 class Scanner:
@@ -54,7 +54,7 @@ class Scanner:
             self._advance()
 
         if self._is_at_end():
-            error(self.line, "Unterminated str")
+            scan_error(self.line, "Unterminated str")
             return
 
         self._advance()
@@ -71,7 +71,7 @@ class Scanner:
                 self._advance() 
 
         value = self.source[self.start:self.current]
-        self._add_token(TokenType.NUMBER, value)
+        self._add_token(TokenType.NUMBER, float(value))
 
     def _is_alpha(self, char):
         return char.isalpha() or char == "_"
@@ -140,7 +140,7 @@ class Scanner:
                     self._advance()
 
                 if self._is_at_end():
-                    error(self.line, "Unterminated comment")
+                    scan_error(self.line, "Unterminated comment")
                     return
 
                 self._advance()
@@ -163,7 +163,7 @@ class Scanner:
             elif self._is_alpha(c):
                self._identifier() 
             else:
-                error(self.line, "Unexpected character.")
+                scan_error(self.line, f"Unexpected character {self.source[self.current - 1]}")
         
     # entry point
     def scan_tokens(self) -> list[Token]:

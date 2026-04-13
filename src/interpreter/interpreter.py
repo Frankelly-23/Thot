@@ -1,15 +1,62 @@
 
 from parser.expr import *
 from scanner.tokenType import TokenType
+from scanner.token import Token
 from typing import Any
+import sys
+import errorUtils
 
+class ThotRuntimeError(RuntimeError):
+
+   def __init__(self, token: Token, message: str):
+       super().__init__(message) 
+       self.token = token
+    
 class Interpreter(Visitor): 
+    
+    def interpret(self, expression: Expr):
+        try:
+            value: Any = self.evaluate(expression)
+            sys.stdout.write(f"{self._thotxify(value)}\n")
 
+        except ThotRuntimeError as error:
+            errorUtils.runtimeError(error) 
+        
+        
     def evaluate(self, expr: Expr):
         return expr.accept(self)
 
     def _is_truthy(self, value: Any):
         return True if value else False  
+    
+    def _check_num_operand(self, operator: Token, operand: Any):
+        if isinstance(operand, float):
+            return
+
+        raise ThotRuntimeError(operator, f"Operand must be numbers ")
+
+    def _check_binary_operands(self, operator: Token, operand_right: Any, operand_left: Any):
+    
+        if isinstance(operand_right, float) and isinstance(operand_left, float):
+            return
+
+        raise ThotRuntimeError(operator, f"Operands must be numbers")
+    
+    def _thotxify(self, value: Any):
+
+        if value == None:
+            return 'nada'
+        if value == True:
+            return 'one'
+        if value == False:
+            return 'zero'
+
+        if isinstance(value, float):
+           if str(value).endswith(".0"): 
+                return str(value)[0:-2] 
+           else:
+              return str(value)   
+        return str(value) 
 
     def visit_binary_expr(self, expr: Binary):
 
@@ -19,33 +66,42 @@ class Interpreter(Visitor):
         match expr.operator.type:
             # aricmetic
             case TokenType.MINUS:
-               return int(left) - int(right)
+               self._check_binary_operands(expr.operator, left, right)
+               return float(left) - int(right)
 
             case TokenType.PLUS:
                 if isinstance(left, str) and isinstance(right, str):
                     return str(left) + str(right)
 
-                if isinstance(left, int) and isinstance(right, int):
-                    return int(left) + int(right)
+                if isinstance(left, float) and isinstance(right, float):
+                    return float(left) + float(right)
+
+                raise ThotRuntimeError(expr.operator, "Operands must be strings | numbers") 
 
             case TokenType.SLASH:
-               return int(left) / int(right)
+               self._check_binary_operands(expr.operator, left, right)
+               return float(left) / float(right)
 
             case TokenType.STAR:
-               return int(left) * int(right)
+               self._check_binary_operands(expr.operator, left, right)
+               return float(left) * float(right)
 
             # comparison
             case TokenType.GREATER:
-                return int(left) > int(right)
+                self._check_binary_operands(expr.operator, left, right)
+                return float(left) > float(right)
 
             case TokenType.LESS:
-                return int(left) < int(right)
+                self._check_binary_operands(expr.operator, left, right)
+                return float(left) < float(right)
 
             case TokenType.GREATER_EQUAL:
-                return int(left) >= int(right)
+                self._check_binary_operands(expr.operator, left, right)
+                return float(left) >= float(right)
 
             case TokenType.LESS_EQUAL:
-                return int(left) <= int(right)
+                self._check_binary_operands(expr.operator, left, right)
+                return float(left) <= float(right)
             
             case TokenType.EQUAL_EQUAL:
                 return left == right 
@@ -53,7 +109,7 @@ class Interpreter(Visitor):
             case TokenType.BANG_EQUAL:
                 return left != right 
 
-        return None 
+        return None    
 
     def visit_unary_expr(self, expr: Unary):
 
@@ -64,7 +120,8 @@ class Interpreter(Visitor):
                 return not self._is_truthy(right)
 
             case TokenType.MINUS:
-               return -int(right)
+               self._check_num_operand(expr.operator, right)
+               return -float(right)
         return None
 
     def visit_grouping_expr(self, expr: Grouping):
