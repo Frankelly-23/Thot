@@ -23,13 +23,12 @@ def run(source: str):
     
 
     if errorUtils.had_error:
-       sys.exit(65) 
+        return
 
     interpreter.interpret(expresion)
 
     if errorUtils.hadRuntimeError:
-       sys.exit(70) 
-
+        return
     
 def run_file(path: str):
     with open(path, "r", encoding="utf-8") as file:
@@ -46,9 +45,15 @@ def run_prompt():
         try:
            expresion = input("Thot [> ") 
            run(expresion)
+
            errorUtils.had_error = False
+           errorUtils.hadRuntimeError = False
+
         except EOFError:
-            print()
+            print("Exiting Thot...")
+            break
+        except KeyboardInterrupt:
+            print("Exiting Thot...")
             break
 
 def main() -> None:

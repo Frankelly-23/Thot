@@ -76,11 +76,21 @@ class Interpreter(Visitor):
                 if isinstance(left, float) and isinstance(right, float):
                     return float(left) + float(right)
 
+                if isinstance(left, float):
+                    return str(int(left)) + str(right)
+                        
+                if isinstance(right, float):
+                    return str(left) + str(int(right))
+
                 raise ThotRuntimeError(expr.operator, "Operands must be strings | numbers") 
 
             case TokenType.SLASH:
                self._check_binary_operands(expr.operator, left, right)
-               return float(left) / float(right)
+
+               if float(right) != 0:
+                    return float(left) / float(right)
+
+               return None  
 
             case TokenType.STAR:
                self._check_binary_operands(expr.operator, left, right)
@@ -129,3 +139,4 @@ class Interpreter(Visitor):
 
     def visit_literal_expr(self, expr: Literal):
         return expr.value
+
