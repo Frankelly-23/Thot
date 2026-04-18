@@ -2,10 +2,15 @@
 import sys
 from scanner.token import Token
 from scanner.tokenType import TokenType 
-from interpreter.interpreter import ThotRuntimeError
 
 had_error = False
 hadRuntimeError = False 
+
+class ThotRuntimeError(RuntimeError):
+
+   def __init__(self, token: Token, message: str):
+       super().__init__(message) 
+       self.token = token
 
 def report(line: int, where: str, message: str):
     global had_error

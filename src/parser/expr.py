@@ -37,6 +37,13 @@ class Unary(Expr):
 	def accept(self, visitor: 'Visitor'):
 		return visitor.visit_unary_expr(self)
 
+class Variable(Expr):
+	def __init__(self, name: Token):
+		self.name: Token = name
+
+	def accept(self, visitor: 'Visitor'):
+		return visitor.visit_variable_expr(self)
+
 
 class Visitor(ABC):
 	@abstractmethod
@@ -50,4 +57,7 @@ class Visitor(ABC):
 		pass
 	@abstractmethod
 	def visit_unary_expr(self, expr: Unary):
+		pass
+	@abstractmethod
+	def visit_variable_expr(self, expr: Variable):
 		pass

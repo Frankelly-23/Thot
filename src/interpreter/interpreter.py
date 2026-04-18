@@ -2,27 +2,27 @@
 from parser.expr import *
 from scanner.tokenType import TokenType
 from scanner.token import Token
+from interpreter.stmt import Visitor as VisitorStmt
+from interpreter.stmt import Print, Expresion , Stmt, Var
 from typing import Any
+from interpreter.environment import Environment
 import sys
 import errorUtils
 
-class ThotRuntimeError(RuntimeError):
-
-   def __init__(self, token: Token, message: str):
-       super().__init__(message) 
-       self.token = token
     
-class Interpreter(Visitor): 
-    
-    def interpret(self, expression: Expr):
+class Interpreter(Visitor, VisitorStmt): 
+    _environment = Environment() 
+    def interpret(self, statements: list[Stmt]):
         try:
-            value: Any = self.evaluate(expression)
-            sys.stdout.write(f"{self._thotxify(value)}\n")
+            for statement in statements:
+                self._execute(statement)
 
-        except ThotRuntimeError as error:
+        except errorUtils.ThotRuntimeError as error:
             errorUtils.runtimeError(error) 
         
-        
+    def _execute(self, stmt: Stmt): 
+       stmt.accept(self) 
+
     def evaluate(self, expr: Expr):
         return expr.accept(self)
 
@@ -33,14 +33,14 @@ class Interpreter(Visitor):
         if isinstance(operand, float):
             return
 
-        raise ThotRuntimeError(operator, f"Operand must be numbers ")
+        raise errorUtils.ThotRuntimeError(operator, f"Operand must be numbers ")
 
     def _check_binary_operands(self, operator: Token, operand_right: Any, operand_left: Any):
     
         if isinstance(operand_right, float) and isinstance(operand_left, float):
             return
 
-        raise ThotRuntimeError(operator, f"Operands must be numbers")
+        raise errorUtils.ThotRuntimeError(operator, f"Operands must be numbers")
     
     def _thotxify(self, value: Any):
 
@@ -82,7 +82,7 @@ class Interpreter(Visitor):
                 if isinstance(right, float):
                     return str(left) + str(int(right))
 
-                raise ThotRuntimeError(expr.operator, "Operands must be strings | numbers") 
+                raise errorUtils.ThotRuntimeError(expr.operator, "Operands must be strings | numbers") 
 
             case TokenType.SLASH:
                self._check_binary_operands(expr.operator, left, right)
@@ -139,4 +139,25 @@ class Interpreter(Visitor):
 
     def visit_literal_expr(self, expr: Literal):
         return expr.value
+    
+    def visit_expresion_stmt(self, stmt: Expresion):
+        self.evaluate(stmt.expression) 
+
+    def visit_print_stmt(self, stmt: Print):
+        value: Any = self.evaluate(stmt.expression)
+        print(self._thotxify(value))
+    
+
+    def visit_var_stmt(self, stmt: Var):
+        value: Any = None 
+        
+        if stmt.init != None:
+            value = self.evaluate(stmt.init)
+        
+        self._environment._define(stmt.name.lexeme, value)
+        return None
+        
+    def visit_variable_expr(self, expr: Variable):
+
+        return self._environment._get(expr.name)
 

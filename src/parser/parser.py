@@ -1,7 +1,8 @@
 
 from scanner.token import Token
 from scanner.token import TokenType
-from parser.expr import Expr, Binary, Grouping, Literal, Unary 
+from parser.expr import * 
+from interpreter.stmt import * 
 
 class ParseError(Exception): 
     pass
@@ -13,11 +14,50 @@ class Parser:
        self.current: int = 0
    
    def parse(self):
-       try:
-            return self.expression()
-       except ParseError as err:
-            return None 
+        
+       statements: list[Stmt] = []   
 
+       while not self._is_at_end():
+            statements.append(self._declaration())  
+
+       return statements      
+   
+   def _declaration(self):
+       try: 
+           if self._match(TokenType.LET): 
+               return self._var_declaration()
+           return self._statement()
+
+       except ParseError: 
+           self._syncronize() 
+
+   def _statement(self):
+
+       return self._printStmt() if self._match(TokenType.PRINT) else self._exprStatement()
+   
+   def _printStmt(self):
+
+       value: Expr = self.expression() 
+       self._consume(TokenType.SEMICOLON, "Expect ; after value")
+       return Print(value) 
+
+   def _exprStatement(self):
+
+       expr: Expr = self.expression() 
+       self._consume(TokenType.SEMICOLON, "Expect ; after expression")
+       return Expresion(expr) 
+
+   def _var_declaration(self):
+       name: Token = self._consume(TokenType.IDENTIFIER, "Expect variable name") 
+       initializer: Expr = None 
+
+       if self._match(TokenType.EQUAL):
+           initializer = self.expression()      
+
+       self._consume(TokenType.SEMICOLON, "Expect ; after declaration")  
+       return Var(name, initializer)
+
+        
    def _advance(self): 
        if not self._is_at_end():  
             self.current += 1   
@@ -152,6 +192,9 @@ class Parser:
        if self._match(TokenType.STRING, TokenType.NUMBER):
            return Literal(self._previus().literal) 
        
+       if self._match(TokenType.IDENTIFIER):
+           return Variable(self._previus()) 
+
        if self._match(TokenType.LEFT_PAREN):
            expr: Expr = self.expression() 
            self._consume(TokenType.RIGHT_PAREN, "Expected )")

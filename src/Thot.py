@@ -7,8 +7,9 @@ import errorUtils
 from scanner.token import Token
 from scanner.scanner import Scanner
 from parser.parser import Parser
-from parser.expr import Expr
-from interpreter.interpreter import Interpreter 
+from parser.expr import * 
+from interpreter.interpreter import * 
+from interpreter.stmt import *
 
 def run(source: str):
 
@@ -18,14 +19,14 @@ def run(source: str):
     tokens: list[Token] = scanner.scan_tokens()
     
     parser: Parser = Parser(tokens)
-    expresion: Expr = parser.parse()
+    statements: list[Stmt] = parser.parse()
     interpreter = Interpreter()    
     
 
     if errorUtils.had_error:
         return
 
-    interpreter.interpret(expresion)
+    interpreter.interpret(statements)
 
     if errorUtils.hadRuntimeError:
         return

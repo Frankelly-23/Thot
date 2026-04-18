@@ -10,9 +10,15 @@ grammar = [
  "Binary : left: Expr, operator: Token, right: Expr",
  "Grouping : expression: Expr",
  "Literal : value: object",
- "Unary : operator: Token, right: Expr"
+ "Unary : operator: Token, right: Expr",
+ "Variable: name: Token"
 ] 
 
+grammar2 = [
+ "Expresion: expression: Expr",
+ "Print: expression: Expr",
+ "Var: name: Token, init: Expr" 
+] 
 
 def defineType(file, base_n, class_n, fields):
 
@@ -74,3 +80,5 @@ def defineAst(output: str, base_name: str, grammar: list[str]):
         sys.exit(0) 
     
 defineAst(output_dir, "Expr", grammar)    
+# defineAst(output_dir, "Stmt", grammar)    
+
