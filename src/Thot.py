@@ -45,16 +45,21 @@ def run_prompt():
     while True:
         try:
            expresion = input("Thot [> ") 
+
+           if 'exit' in expresion:
+                print("\nExiting Thot...")
+                break
+                     
            run(expresion)
 
            errorUtils.had_error = False
            errorUtils.hadRuntimeError = False
 
         except EOFError:
-            print("Exiting Thot...")
+            print("\nExiting Thot...")
             break
         except KeyboardInterrupt:
-            print("Exiting Thot...")
+            print("\nExiting Thot...")
             break
 
 def main() -> None:

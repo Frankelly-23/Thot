@@ -48,7 +48,7 @@ class Parser:
        return Expresion(expr) 
 
    def _var_declaration(self):
-       name: Token = self._consume(TokenType.IDENTIFIER, "Expect variable name") 
+       name: Token = self._consume(TokenType.IDENTIFIER, "Expect variable name :)") 
        initializer: Expr = None 
 
        if self._match(TokenType.EQUAL):

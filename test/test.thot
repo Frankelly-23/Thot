@@ -1,7 +1,11 @@
 
-23 + 23 
+let welcomeMsg = '[+] This is Thot the programing lang';
+print welcomeMsg;
+
 
 /* 
+
 hola 
 amigos 
+
 */
