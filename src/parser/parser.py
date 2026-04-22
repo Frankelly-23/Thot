@@ -32,8 +32,13 @@ class Parser:
            self._syncronize() 
 
    def _statement(self):
+       if self._match(TokenType.PRINT): 
+           return self._printStmt() 
+       
+       if self._match(TokenType.LEFT_BRACE):
+           return Block(self._block())  
 
-       return self._printStmt() if self._match(TokenType.PRINT) else self._exprStatement()
+       return self._exprStatement()
    
    def _printStmt(self):
 
@@ -46,6 +51,15 @@ class Parser:
        expr: Expr = self.expression() 
        self._consume(TokenType.SEMICOLON, "Expect ; after expression")
        return Expresion(expr) 
+   
+   def _block(self):
+       statements: list[Stmt] = [] 
+
+       while not self._check(TokenType.RIGHT_BRACE) and not self._is_at_end():
+            statements.append(self._declaration())
+        
+       self._consume(TokenType.RIGHT_BRACE, "Expect } after block.") 
+       return statements
 
    def _var_declaration(self):
        name: Token = self._consume(TokenType.IDENTIFIER, "Expect variable name :)") 
@@ -116,7 +130,22 @@ class Parser:
            self._advance() 
 
    def expression(self):
-        return self.comma() 
+        return self.assingment() 
+
+   def assingment(self): 
+        expr: Expr = self.equality()  
+
+        if self._match(TokenType.EQUAL):
+            equals: Token = self._previus()
+            value: Expr = self.assingment()
+
+            if isinstance(expr, Variable):
+                name = expr.name
+                return Assign(name, value)
+                
+            self._error(equals, "Invalid asingment target") 
+
+        return expr 
 
    # Binary
    def comma(self): 

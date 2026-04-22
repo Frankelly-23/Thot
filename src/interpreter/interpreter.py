@@ -3,11 +3,11 @@ from parser.expr import *
 from scanner.tokenType import TokenType
 from scanner.token import Token
 from interpreter.stmt import Visitor as VisitorStmt
-from interpreter.stmt import Print, Expresion , Stmt, Var
+from interpreter.stmt import Print, Expresion , Stmt, Var, Block
 from typing import Any
 from interpreter.environment import Environment
-import sys
 import errorUtils
+from src.interpreter import environment
 
     
 class Interpreter(Visitor, VisitorStmt): 
@@ -22,7 +22,17 @@ class Interpreter(Visitor, VisitorStmt):
         
     def _execute(self, stmt: Stmt): 
        stmt.accept(self) 
+    
+    def _execute_block(self, statements: list[Stmt], environment: Environment):
+        previous: Environment = self._environment
 
+        try: 
+            self._environment = environment
+            for statement in statements:
+                self._execute(statement)
+        finally:
+            self._environment = previous
+        
     def evaluate(self, expr: Expr):
         return expr.accept(self)
 
@@ -161,3 +171,12 @@ class Interpreter(Visitor, VisitorStmt):
 
         return self._environment._get(expr.name)
 
+    def visit_assign_expr(self, expr: Assign):
+        value: Any = self.evaluate(expr.value)
+
+        self._environment._assing(expr.name, value)
+        return value
+         
+    def visit_block_stmt(self, stmt: Block):
+        self._execute_block(stmt.statements, Environment(self._environment))
+        return None

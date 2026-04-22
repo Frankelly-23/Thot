@@ -7,6 +7,7 @@ if len(sys.argv) != 2:
 output_dir = sys.argv[1]
 
 grammar = [
+ "Assign : name: Token, value: Expr",    
  "Binary : left: Expr, operator: Token, right: Expr",
  "Grouping : expression: Expr",
  "Literal : value: object",
@@ -15,6 +16,7 @@ grammar = [
 ] 
 
 grammar2 = [
+ "Block: statements: list[Stmt]",   
  "Expresion: expression: Expr",
  "Print: expression: Expr",
  "Var: name: Token, init: Expr" 
@@ -62,7 +64,9 @@ def defineAst(output: str, base_name: str, grammar: list[str]):
 
             file.write("from abc import ABC, abstractmethod\n") 
             file.write("from scanner.token import Token\n") 
+            file.write("from parser.expr import Expr\n")
             file.write("\n")
+
             file.write(f"class {base_name}(ABC):\n")
             file.write("\t@abstractmethod\n")
             file.write(f"\tdef accept(self, visitor: 'Visitor'):\n")
@@ -79,6 +83,6 @@ def defineAst(output: str, base_name: str, grammar: list[str]):
         sys.stdout.write(f"{e}") 
         sys.exit(0) 
     
-defineAst(output_dir, "Expr", grammar)    
-# defineAst(output_dir, "Stmt", grammar)    
+# defineAst(output_dir, "Expr", grammar)    
+defineAst(output_dir, "Stmt", grammar2)    
 

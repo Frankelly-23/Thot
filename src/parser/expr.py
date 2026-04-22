@@ -6,6 +6,14 @@ class Expr(ABC):
 	def accept(self, visitor: 'Visitor'):
 		pass
 
+class Assign(Expr):
+	def __init__(self, name: Token, value: Expr):
+		self.name: Token = name
+		self.value: Expr = value
+
+	def accept(self, visitor: 'Visitor'):
+		return visitor.visit_assign_expr(self)
+
 class Binary(Expr):
 	def __init__(self, left: Expr, operator: Token, right: Expr):
 		self.left: Expr = left
@@ -46,6 +54,9 @@ class Variable(Expr):
 
 
 class Visitor(ABC):
+	@abstractmethod
+	def visit_assign_expr(self, expr: Assign):
+		pass
 	@abstractmethod
 	def visit_binary_expr(self, expr: Binary):
 		pass
