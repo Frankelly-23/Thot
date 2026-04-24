@@ -1,11 +1,7 @@
 
-let welcomeMsg = '[+] This is Thot the programing lang';
-print welcomeMsg;
+let a = 5;
 
-
-/* 
-
-hola 
-amigos 
-
-*/
+mientras (a > 0) {
+  print a;
+  a = a - 1;
+}

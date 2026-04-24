@@ -11,15 +11,18 @@ grammar = [
  "Binary : left: Expr, operator: Token, right: Expr",
  "Grouping : expression: Expr",
  "Literal : value: object",
+ "Logical : left: Expr, operator: Token, right: Expr",
  "Unary : operator: Token, right: Expr",
  "Variable: name: Token"
 ] 
 
 grammar2 = [
- "Block: statements: list[Stmt]",   
- "Expresion: expression: Expr",
- "Print: expression: Expr",
- "Var: name: Token, init: Expr" 
+ "Block : statements: list[Stmt]",   
+ "Expresion : expression: Expr",
+ "If : condition: Expr, thenBranch: Stmt, elseBranch: Stmt",
+ "Print : expression: Expr",
+ "Var : name: Token, init: Expr",
+ "Mientras : condition: Expr, body: Stmt",
 ] 
 
 def defineType(file, base_n, class_n, fields):
@@ -64,7 +67,10 @@ def defineAst(output: str, base_name: str, grammar: list[str]):
 
             file.write("from abc import ABC, abstractmethod\n") 
             file.write("from scanner.token import Token\n") 
-            file.write("from parser.expr import Expr\n")
+
+            if base_name == 'Stmt':
+                file.write("from parser.expr import Expr\n")
+
             file.write("\n")
 
             file.write(f"class {base_name}(ABC):\n")

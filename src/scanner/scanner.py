@@ -97,13 +97,13 @@ class Scanner:
        match c:
     # Single-character tokens.
         case ")":
-            self._add_token(TokenType.LEFT_PAREN)
-        case "(":
             self._add_token(TokenType.RIGHT_PAREN)
+        case "(":
+            self._add_token(TokenType.LEFT_PAREN)
         case "}":
-            self._add_token(TokenType.LEFT_BRACE)
-        case "{":
             self._add_token(TokenType.RIGHT_BRACE)
+        case "{":
+            self._add_token(TokenType.LEFT_BRACE)
         case ",":
             self._add_token(TokenType.COMMA)
         case ".":

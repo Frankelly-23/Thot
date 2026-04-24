@@ -11,14 +11,14 @@ from parser.expr import *
 from interpreter.interpreter import * 
 from interpreter.stmt import *
 
-def run(source: str):
+def run(source: str, is_relp: bool = False):
 
        
 
     scanner: Scanner = Scanner(source)
     tokens: list[Token] = scanner.scan_tokens()
     
-    parser: Parser = Parser(tokens)
+    parser: Parser = Parser(tokens, is_relp)
     statements: list[Stmt] = parser.parse()
     interpreter = Interpreter()    
     
@@ -50,7 +50,7 @@ def run_prompt():
                 print("\nExiting Thot...")
                 break
                      
-           run(expresion)
+           run(expresion, is_relp=True)
 
            errorUtils.had_error = False
            errorUtils.hadRuntimeError = False

@@ -16,5 +16,5 @@ KEYWORDS = {
         "self":   TokenType.SELF,
         "one":   TokenType.ONE,
         "let":    TokenType.LET,
-        "while":  TokenType.WHILE,
+        "mientras":  TokenType.MIENTRAS,
     }

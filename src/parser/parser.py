@@ -9,9 +9,10 @@ class ParseError(Exception):
 
 class Parser:
         
-   def __init__(self, tokens: list[Token]): 
+   def __init__(self, tokens: list[Token], is_relp: bool = False): 
        self.tokens = tokens   
        self.current: int = 0
+       self.is_relp: bool = is_relp 
    
    def parse(self):
         
@@ -32,14 +33,90 @@ class Parser:
            self._syncronize() 
 
    def _statement(self):
+
+       if self._match(TokenType.FOR):
+           return self._for_statement()
+
+       if self._match(TokenType.IF):
+           return self._if_statement()
+
        if self._match(TokenType.PRINT): 
            return self._printStmt() 
        
+       if self._match(TokenType.MIENTRAS): 
+           return self._WhileStmt() 
+
        if self._match(TokenType.LEFT_BRACE):
            return Block(self._block())  
 
        return self._exprStatement()
-   
+           
+   def _for_statement(self):
+       self._consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.") 
+       
+       initializer = None  
+
+       if self._match(TokenType.SEMICOLON): 
+           initializer = None  
+       elif self._match(TokenType.LET): 
+           initializer = self._var_declaration()  
+       else:  
+           initializer = self._exprStatement() 
+       
+       condition: Expr | None = None 
+        
+       if self._check(TokenType.SEMICOLON): 
+           condition = self.expression() 
+
+       self._consume(TokenType.SEMICOLON, "Expect ';' after loop condition")   
+
+       increment: Expr | None = None 
+        
+       if not self._check(TokenType.RIGHT_PAREN): 
+           increment = self.expression() 
+       self._consume(TokenType.RIGHT_PAREN, "Expect ')' after for closes")   
+
+       body: Stmt = self._statement()
+
+       if increment != None:
+           body = Block([body, Expresion(increment)])
+       
+       if condition == None:
+           condition = Literal(True)
+       body = Mientras(condition, body) 
+
+       if initializer != None:
+           body = Block([initializer, body])
+
+       return body
+
+  
+   def _WhileStmt(self): 
+
+       self._consume(TokenType.LEFT_PAREN, "Expect '(' after 'mientras'.") 
+       condition: Expr = self.expression() 
+       self._consume(TokenType.RIGHT_PAREN, "Expect ')' after condition.") 
+
+       body: Stmt = self._statement()
+
+       return Mientras(condition, body)
+
+
+   def _if_statement(self):
+       self._consume(TokenType.LEFT_PAREN, "Expect '(' after 'if'")
+       condition: Expr = self.expression() 
+       self._consume(TokenType.RIGHT_PAREN, "Expect ')' after if condition") 
+
+       thenBranch: Stmt = self._statement()
+       elseBranch: Stmt | None = None
+
+       if self._match(TokenType.ELSE):
+           elseBranch = self._statement()
+       
+       return If(condition, thenBranch, elseBranch)
+
+
+
    def _printStmt(self):
 
        value: Expr = self.expression() 
@@ -49,6 +126,10 @@ class Parser:
    def _exprStatement(self):
 
        expr: Expr = self.expression() 
+
+       if self.is_relp and self._is_at_end():
+           return Print(expr) 
+
        self._consume(TokenType.SEMICOLON, "Expect ; after expression")
        return Expresion(expr) 
    
@@ -63,7 +144,7 @@ class Parser:
 
    def _var_declaration(self):
        name: Token = self._consume(TokenType.IDENTIFIER, "Expect variable name :)") 
-       initializer: Expr = None 
+       initializer: Expr | None = None 
 
        if self._match(TokenType.EQUAL):
            initializer = self.expression()      
@@ -123,7 +204,7 @@ class Parser:
            
            match self._peek().type:
             case ( TokenType.CLASS | TokenType.FN | TokenType.LET | 
-                   TokenType.FOR | TokenType.IF | TokenType.WHILE | 
+                   TokenType.FOR | TokenType.IF | TokenType.MIENTRAS| 
                    TokenType.PRINT | TokenType.RETURN ):
                return 
 
@@ -133,7 +214,7 @@ class Parser:
         return self.assingment() 
 
    def assingment(self): 
-        expr: Expr = self.equality()  
+        expr: Expr = self._or()  
 
         if self._match(TokenType.EQUAL):
             equals: Token = self._previus()
@@ -143,11 +224,33 @@ class Parser:
                 name = expr.name
                 return Assign(name, value)
                 
-            self._error(equals, "Invalid asingment target") 
+            raise self._error(equals, "Invalid asingment target") 
 
         return expr 
 
    # Binary
+   def _or(self):  
+       expr: Expr = self._and()
+
+       while self._match(TokenType.OR):
+           operator: Token = self._previus()
+           right: Expr = self._and()
+           expr = Logical(expr, operator, right)
+
+       return expr 
+
+   def _and(self):
+       expr: Expr = self.comma()
+       
+       while self._match(TokenType.AND):
+           operator: Token = self._previus()
+           right: Expr = self.equality()
+           expr = Logical(expr, operator, right)
+       
+       return expr
+
+
+
    def comma(self): 
        expr: Expr = self.equality() 
 

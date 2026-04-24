@@ -1,18 +1,22 @@
 
-from parser.expr import *
-from scanner.tokenType import TokenType
-from scanner.token import Token
-from interpreter.stmt import Visitor as VisitorStmt
-from interpreter.stmt import Print, Expresion , Stmt, Var, Block
 from typing import Any
+
+from parser.expr import *
+from scanner.token import Token
+from scanner.tokenType import TokenType
+from scanner.keywords import *
+
 from interpreter.environment import Environment
+from interpreter.stmt import Visitor as VisitorStmt, Print, Expresion, Stmt, Var, Block, If, Mientras
+
 import errorUtils
-from src.interpreter import environment
 
     
 class Interpreter(Visitor, VisitorStmt): 
     _environment = Environment() 
+
     def interpret(self, statements: list[Stmt]):
+
         try:
             for statement in statements:
                 self._execute(statement)
@@ -180,3 +184,32 @@ class Interpreter(Visitor, VisitorStmt):
     def visit_block_stmt(self, stmt: Block):
         self._execute_block(stmt.statements, Environment(self._environment))
         return None
+
+    def visit_if_stmt(self, stmt: If):
+
+        if self._is_truthy(self.evaluate(stmt.condition)):        
+            self._execute(stmt.thenBranch) 
+
+        elif stmt.elseBranch != None:
+            self._execute(stmt.elseBranch)
+
+        return None
+    
+    def visit_logical_expr(self, expr: Logical):
+        left: Any = self.evaluate(expr.left)
+
+        if expr.operator.type == TokenType.OR:
+            if self._is_truthy(left):
+                return left
+        else: 
+            if not self._is_truthy(left):
+                return left
+
+        return self.evaluate(expr.right)
+
+    def visit_mientras_stmt(self, stmt: Mientras):
+        while self._is_truthy(self.evaluate(stmt.condition)):
+            self._execute(stmt.body)  
+
+        return None
+

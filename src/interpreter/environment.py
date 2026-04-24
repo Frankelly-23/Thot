@@ -3,10 +3,10 @@ from parser.expr import *
 from errorUtils import ThotRuntimeError
 
 class Environment():
-    _values: dict[str, Any] = {}
     
     def __init__(self, enclosing: 'Environment | None' = None):
         self.enclosing = enclosing 
+        self._values: dict[str, Any] = {}
 
     def _get(self, name: Token):
     
