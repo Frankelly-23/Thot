@@ -7,7 +7,7 @@ from scanner.tokenType import TokenType
 from scanner.keywords import *
 
 from interpreter.environment import Environment
-from interpreter.stmt import Visitor as VisitorStmt, Print, Expresion, Stmt, Var, Block, If, Mientras
+from interpreter.stmt import Visitor as VisitorStmt, Print, Expresion, Stmt, Var, Block, If, Mientras, Continue, Break
 
 import errorUtils
 
@@ -58,12 +58,14 @@ class Interpreter(Visitor, VisitorStmt):
     
     def _thotxify(self, value: Any):
 
+        if isinstance(value, bool):        
+            if value == True:
+                return 'one'
+            if value == False:
+                return 'zero'
+
         if value == None:
             return 'nada'
-        if value == True:
-            return 'one'
-        if value == False:
-            return 'zero'
 
         if isinstance(value, float):
            if str(value).endswith(".0"): 
@@ -209,7 +211,17 @@ class Interpreter(Visitor, VisitorStmt):
 
     def visit_mientras_stmt(self, stmt: Mientras):
         while self._is_truthy(self.evaluate(stmt.condition)):
-            self._execute(stmt.body)  
+            try:     
+                self._execute(stmt.body)  
+            except errorUtils.BreakException: 
+                break
+            except errorUtils.ContinueException: 
+                continue 
 
         return None
+    
+    def visit_break_stmt(self, stmt: Break):
+        raise errorUtils.BreakException()
 
+    def visit_continue_stmt(self, stmt: Continue):
+        raise errorUtils.ContinueException()

@@ -53,6 +53,16 @@ class Mientras(Stmt):
 	def accept(self, visitor: 'Visitor'):
 		return visitor.visit_mientras_stmt(self)
 
+class Break(Stmt):
+
+	def accept(self, visitor: 'Visitor'):
+		return visitor.visit_break_stmt(self)
+
+class Continue(Stmt):
+
+	def accept(self, visitor: 'Visitor'):
+		return visitor.visit_continue_stmt(self)
+
 
 class Visitor(ABC):
 	@abstractmethod
@@ -72,4 +82,10 @@ class Visitor(ABC):
 		pass
 	@abstractmethod
 	def visit_mientras_stmt(self, stmt: Mientras):
+		pass
+	@abstractmethod
+	def visit_break_stmt(self, stmt: Break):
+		pass
+	@abstractmethod
+	def visit_continue_stmt(self, stmt: Continue):
 		pass

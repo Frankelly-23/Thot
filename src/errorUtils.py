@@ -6,6 +6,12 @@ from scanner.tokenType import TokenType
 had_error = False
 hadRuntimeError = False 
 
+class BreakException(Exception):
+   pass  
+
+class ContinueException(Exception):
+   pass  
+
 class ThotRuntimeError(RuntimeError):
 
    def __init__(self, token: Token, message: str):

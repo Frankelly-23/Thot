@@ -23,6 +23,8 @@ grammar2 = [
  "Print : expression: Expr",
  "Var : name: Token, init: Expr",
  "Mientras : condition: Expr, body: Stmt",
+ "Break: ",
+ "Continue: "
 ] 
 
 def defineType(file, base_n, class_n, fields):
@@ -31,14 +33,15 @@ def defineType(file, base_n, class_n, fields):
     file.write(f"class {class_n}({base_n}):\n") 
 
     # child class constructor
-    file.write(f"\tdef __init__(self, {fields}):\n")
-    fieldList = fields.split(", ")
+    if class_n != "Continue" and class_n != "Break": 
+        file.write(f"\tdef __init__(self, {fields}):\n")
+        fieldList = fields.split(", ")
 
 
-    for field in fieldList:
-        name = field.split(":")[0].strip()   
-        Ptype = field.split(":")[1].strip()   
-        file.write(f"\t\tself.{name}: {Ptype} = {name}\n")  
+        for field in fieldList:
+            name = field.split(":")[0].strip()   
+            Ptype = field.split(":")[1].strip()   
+            file.write(f"\t\tself.{name}: {Ptype} = {name}\n")  
 
     file.write("\n")
     file.write("\tdef accept(self, visitor: 'Visitor'):\n")  

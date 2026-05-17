@@ -17,4 +17,6 @@ KEYWORDS = {
         "one":   TokenType.ONE,
         "let":    TokenType.LET,
         "mientras":  TokenType.MIENTRAS,
+        "break": TokenType.BREAK,
+        "continue": TokenType.CONTINUE
     }

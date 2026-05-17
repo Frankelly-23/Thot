@@ -34,6 +34,14 @@ class Parser:
 
    def _statement(self):
 
+       if self._match(TokenType.BREAK):
+           self._consume(TokenType.SEMICOLON, "Expect ';' after 'break'.")
+           return Break()
+
+       if self._match(TokenType.CONTINUE):
+           self._consume(TokenType.SEMICOLON, "Expect ';' after 'continue'.")
+           return Continue()
+
        if self._match(TokenType.FOR):
            return self._for_statement()
 
@@ -52,8 +60,8 @@ class Parser:
        return self._exprStatement()
            
    def _for_statement(self):
+
        self._consume(TokenType.LEFT_PAREN, "Expect '(' after 'for'.") 
-       
        initializer = None  
 
        if self._match(TokenType.SEMICOLON): 
@@ -65,7 +73,7 @@ class Parser:
        
        condition: Expr | None = None 
         
-       if self._check(TokenType.SEMICOLON): 
+       if not self._check(TokenType.SEMICOLON): 
            condition = self.expression() 
 
        self._consume(TokenType.SEMICOLON, "Expect ';' after loop condition")   

@@ -7,7 +7,6 @@ class Environment():
     def __init__(self, enclosing: 'Environment | None' = None):
         self.enclosing = enclosing 
         self._values: dict[str, Any] = {}
-
     def _get(self, name: Token):
     
         if name.lexeme in self._values: 

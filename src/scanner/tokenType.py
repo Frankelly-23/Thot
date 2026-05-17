@@ -47,6 +47,7 @@ class TokenType(Enum):
     ONE = auto() # one
     LET = auto() # var
     MIENTRAS = auto() # While
-
+    BREAK = auto()
+    CONTINUE = auto()
     EOF = auto()
 
